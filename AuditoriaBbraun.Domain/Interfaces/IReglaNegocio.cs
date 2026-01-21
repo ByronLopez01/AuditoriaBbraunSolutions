@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace AuditoriaBbraun.Domain.Interfaces
 {
-    internal class IReglaNegocio
+    public interface IReglaNegocio
     {
+        bool EsValido();
+        string MensajeError { get; }
     }
 }

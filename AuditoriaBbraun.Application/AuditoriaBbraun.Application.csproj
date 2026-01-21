@@ -7,8 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\Commands\" />
-    <Folder Include="UseCases\Queries\" />
+    <PackageReference Include="AutoMapper" Version="16.0.0" />
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="MediatR" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AuditoriaBbraun.Domain\AuditoriaBbraun.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace AuditoriaBbraun.Domain.Interfaces
 {
-    internal class IEntidadAgregado
+    public interface IEntidadAgregado
     {
+        int Id { get; }
+        DateTime FechaCreacion { get; }
     }
 }

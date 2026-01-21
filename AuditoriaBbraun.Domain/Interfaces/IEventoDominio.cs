@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace AuditoriaBbraun.Domain.Interfaces
 {
-    internal class IEventoDominio
+    public interface IEventoDominio
     {
+        DateTime FechaOcurrencia { get; }
     }
 }

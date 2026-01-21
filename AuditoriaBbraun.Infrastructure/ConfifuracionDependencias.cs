@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AuditoriaBbraun.Infrastructure
 {
-    internal class CondifuracionDependencias
+    internal class ConfifuracionDependencias
     {
     }
 }

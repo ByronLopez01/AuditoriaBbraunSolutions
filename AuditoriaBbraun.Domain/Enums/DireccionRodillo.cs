@@ -6,7 +6,16 @@ using System.Threading.Tasks;
 
 namespace AuditoriaBbraun.Domain.Enums
 {
-    internal class DireccionRodillo
+    public enum DireccionRodillo
     {
+        Izquierda,
+        Derecha,
+        Router0,
+        Router1,
+        Router2,
+        Router3,
+        ExitPort1,
+        ExitPort2,
+        ExitPort3
     }
 }

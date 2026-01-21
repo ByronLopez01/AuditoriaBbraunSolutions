@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace AuditoriaBbraun.Domain.Enums
 {
-    internal class EstadoOrden
+    public enum EstadoOrden
     {
+        Pendiente = 1,
+        Procesando = 2,
+        Completada = 3,
+        Cancelada = 4,
+        Error = 5
     }
 }
