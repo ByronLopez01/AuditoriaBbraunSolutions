@@ -1,0 +1,24 @@
+.login-layout {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(140% 120% at 10% 10%, rgba(0, 155, 131, 0.06), transparent 60%), #f7fbfa;
+    padding: 1.5rem;
+}
+
+.login-logo-floating {
+    position: fixed;
+    top: 1.25rem;
+    left: 1.5rem;
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.login-main {
+    width: min(880px, 100%);
+}

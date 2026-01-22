@@ -1,7 +1,103 @@
-﻿@page "/"
+﻿@page "/home"
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Panel de Auditoría</PageTitle>
 
-<h1>Hello, world!</h1>
+<section class="hero">
+    <div class="hero-block">
+        <p class="hero-eyebrow"><i class="bi bi-cpu me-2"></i>DWS System · API dispositivos</p>
+        <h1>Panel de captura</h1>
+        <p>Monitorea medidas, imágenes y control de LEDs de los dispositivos DWS en tiempo real.</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="counter"><i class="bi bi-cloud-arrow-down me-2"></i>Probar captura (POST /procesar-datos)</a>
+            <a class="btn btn-ghost" href="weather"><i class="bi bi-journal-text me-2"></i>Ver registros simulados</a>
+        </div>
+        <div class="hero-endpoints">
+            <span class="badge info"><i class="bi bi-hdd-network me-1"></i>POST /api/dispositivos/procesar-datos</span>
+            <span class="badge info"><i class="bi bi-image me-1"></i>POST /api/dispositivos/subir-imagen</span>
+            <span class="badge info"><i class="bi bi-lightbulb me-1"></i>POST /api/dispositivos/controlar-leds</span>
+            <span class="badge success"><i class="bi bi-shield-check me-1"></i>GET /api/dispositivos/salud</span>
+        </div>
+    </div>
 
-Welcome to your new app.
+    <div class="card api-status">
+        <div class="stat-label"><i class="bi bi-activity me-2"></i>Estado API dispositivos</div>
+        <div class="stat-value">OK</div>
+        <div class="stat-trend positive">Última respuesta: hace 2 min</div>
+        <ul class="list compact">
+            <li>
+                <span><i class="bi bi-cloud-arrow-down me-2"></i>Procesar datos</span>
+                <span class="badge success"><i class="bi bi-check-circle me-1"></i>200 · JSON</span>
+            </li>
+            <li>
+                <span><i class="bi bi-image me-2"></i>Subir imagen</span>
+                <span class="badge info"><i class="bi bi-file-earmark-arrow-up me-1"></i>200 · multipart</span>
+            </li>
+            <li>
+                <span><i class="bi bi-lightbulb me-2"></i>Controlar LEDs</span>
+                <span class="badge warning"><i class="bi bi-exclamation-circle me-1"></i>Validar estado</span>
+            </li>
+            <li>
+                <span><i class="bi bi-shield-check me-2"></i>Salud</span>
+                <span class="badge success"><i class="bi bi-heart-pulse me-1"></i>GET</span>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<section class="grid-3">
+    <div class="card stat">
+        <div class="stat-label"><i class="bi bi-hdd-network me-2"></i>Dispositivos reportando</div>
+        <div class="stat-value">12</div>
+        <div class="stat-trend positive">100% de los dispositivos operativos</div>
+    </div>
+    <div class="card stat">
+        <div class="stat-label"><i class="bi bi-image me-2"></i>Imágenes recibidas hoy</div>
+        <div class="stat-value">48</div>
+        <div class="stat-trend neutral">Tipos: code, depth, env, screen, label</div>
+    </div>
+    <div class="card stat">
+        <div class="stat-label"><i class="bi bi-grid-3x3-gap me-2"></i>Slots en trabajo</div>
+        <div class="stat-value">5</div>
+        <div class="stat-trend positive">Estados: free · work · done</div>
+    </div>
+</section>
+
+<section class="grid-3" style="margin-top:1rem">
+    <div class="card">
+        <h2 class="h5 mb-2"><i class="bi bi-cloud-arrow-down me-2"></i>POST /procesar-datos</h2>
+        <p class="text-muted">Recibe medidas (peso, largo, ancho, alto, volumen) y metadatos del dispositivo.</p>
+        <div class="badge info"><i class="bi bi-code-slash me-1"></i>JSON</div>
+    </div>
+    <div class="card">
+        <h2 class="h5 mb-2"><i class="bi bi-image me-2"></i>POST /subir-imagen</h2>
+        <p class="text-muted">Valida tipo (code, depth, env, screen, label) y guarda en /uploads/imagenes.</p>
+        <div class="badge info"><i class="bi bi-upload me-1"></i>multipart/form-data</div>
+    </div>
+    <div class="card">
+        <h2 class="h5 mb-2"><i class="bi bi-lightbulb me-2"></i>POST /controlar-leds</h2>
+        <p class="text-muted">Controla LEDs por slot (estados permitidos: free, work, done).</p>
+        <div class="badge warning"><i class="bi bi-exclamation-triangle me-1"></i>Validación de estado</div>
+    </div>
+</section>
+
+<section class="card" style="margin-top:1rem">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h5 mb-0"><i class="bi bi-flag me-2"></i>Próximas acciones</h2>
+        <a class="link-muted" href="counter">Ver todas</a>
+    </div>
+    <ul class="list">
+        <li>
+            <span><i class="bi bi-exclamation-octagon me-2"></i>Revisión de dispositivos críticos</span>
+            <span class="badge success"><i class="bi bi-check-circle me-1"></i>Hoy</span>
+        </li>
+        <li>
+            <span><i class="bi bi-clipboard-check me-2"></i>Validación de informes regionales</span>
+            <span class="badge info"><i class="bi bi-calendar-event me-1"></i>Mañana</span>
+        </li>
+        <li>
+            <span><i class="bi bi-shield-exclamation me-2"></i>Cierre de hallazgos de seguridad</span>
+            <span class="badge warning"><i class="bi bi-hourglass-split me-1"></i>En 3 días</span>
+        </li>
+    </ul>
+</section>

@@ -1,0 +1,107 @@
+﻿@page "/login"
+@page "/"
+@rendermode InteractiveServer
+@layout AuditoriaBbraun.BlazorWeb.Components.Layout.LoginLayout
+@inject HttpClient Http
+@inject NavigationManager Nav
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Iniciar sesión</PageTitle>
+
+<section class="login-shell">
+    <div class="login-card">
+        <header class="login-header">
+            <div class="login-brand">
+                <div class="login-brand-text">
+                    <p class="eyebrow">BBraun · DWS</p>
+                    <h1>Acceso seguro</h1>
+                    <p class="muted">Autentícate con tu usuario y contraseña asignados.</p>
+                </div>
+            </div>
+        </header>
+
+        <EditForm Model="_model" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger mb-3" />
+            <div class="form-grid">
+                <div>
+                    <label for="username" class="form-label">Usuario</label>
+                    <InputText id="username" class="form-control" @bind-Value="_model.Username" />
+                    <ValidationMessage For="@(() => _model.Username)" class="text-danger" />
+                </div>
+                <div>
+                    <label for="password" class="form-label">Contraseña</label>
+                    <InputText id="password"
+                               class="form-control"
+                               type="password"
+                               @bind-Value="_model.Password" />
+                    <ValidationMessage For="@(() => _model.Password)" class="text-danger" />
+                </div>
+            </div>
+
+            <div class="login-actions">
+                <button class="btn btn-primary" type="submit" disabled="@_loading">
+                    @_loginButtonText
+                </button>
+                @if (!string.IsNullOrWhiteSpace(_statusMessage))
+                {
+                    <span class="@_statusClass">@_statusMessage</span>
+                }
+            </div>
+        </EditForm>
+    </div>
+</section>
+
+@code {
+    private readonly LoginRequest _model = new();
+    private bool _loading;
+    private string? _statusMessage;
+    private string _statusClass = "text-muted";
+    private string _loginButtonText => _loading ? "Ingresando..." : "Iniciar sesión";
+
+    private async Task HandleLogin()
+    {
+        _loading = true;
+        _statusMessage = null;
+        _statusClass = "text-muted";
+
+        // Demo local: valida campos y redirige.
+        await Task.Delay(200);
+
+        if (string.IsNullOrWhiteSpace(_model.Username) || string.IsNullOrWhiteSpace(_model.Password))
+        {
+            _statusMessage = "Usuario y contraseña son obligatorios.";
+            _statusClass = "text-danger";
+            _loading = false;
+            return;
+        }
+
+        _statusMessage = $"Bienvenido, {_model.Username} (demo).";
+        _statusClass = "text-success";
+        _loading = false;
+
+        Nav.NavigateTo("/home", forceLoad: true);
+    }
+
+    public class LoginRequest
+    {
+        [Required(ErrorMessage = "El usuario es obligatorio")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Mínimo 3 caracteres")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Mínimo 6 caracteres")]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class AuthResponse
+    {
+        public string Id { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Rol { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
+}
