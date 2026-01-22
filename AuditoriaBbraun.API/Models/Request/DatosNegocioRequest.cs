@@ -1,45 +1,75 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace AuditoriaBbraun.API.Models.Request
 {
-
-    //Modelo para la maquina 
+    /// <summary>
+    /// Payload JSON para la interfaz de negocio de DWSSystem.
+    /// Campos opcionales (permiten NULL según la especificación).
+    /// </summary>
     public class DatosNegocioRequest
     {
-        [Required(ErrorMessage = "El código de barras es requerido")]
-        public string CodigoBarras { get; set; }
+        [JsonPropertyName("barcode")]
+        [MaxLength(500, ErrorMessage = "El código de barras no puede exceder 500 caracteres")]
+        public string? Barcode { get; set; }
 
-        [Required(ErrorMessage = "El peso es requerido")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "El peso debe ser mayor a cero")]
-        public decimal Peso { get; set; }
+        [JsonPropertyName("weight")]
+        [Range(0, double.MaxValue, ErrorMessage = "El peso no puede ser negativo")]
+        public decimal? Weight { get; set; }
 
-        [Required(ErrorMessage = "El largo es requerido")]
-        [Range(0.1, double.MaxValue, ErrorMessage = "El largo debe ser mayor a cero")]
-        public decimal Largo { get; set; }
+        [JsonPropertyName("length")]
+        [Range(0, double.MaxValue, ErrorMessage = "El largo no puede ser negativo")]
+        public decimal? Length { get; set; }
 
-        [Required(ErrorMessage = "El ancho es requerido")]
-        [Range(0.1, double.MaxValue, ErrorMessage = "El ancho debe ser mayor a cero")]
-        public decimal Ancho { get; set; }
+        [JsonPropertyName("width")]
+        [Range(0, double.MaxValue, ErrorMessage = "El ancho no puede ser negativo")]
+        public decimal? Width { get; set; }
 
-        [Required(ErrorMessage = "El alto es requerido")]
-        [Range(0.1, double.MaxValue, ErrorMessage = "El alto debe ser mayor a cero")]
-        public decimal Alto { get; set; }
+        [JsonPropertyName("height")]
+        [Range(0, double.MaxValue, ErrorMessage = "El alto no puede ser negativo")]
+        public decimal? Height { get; set; }
 
-        [Required(ErrorMessage = "El volumen es requerido")]
-        public decimal Volumen { get; set; }
+        [JsonPropertyName("volume")]
+        [Range(0, double.MaxValue, ErrorMessage = "El volumen no puede ser negativo")]
+        public decimal? Volume { get; set; }
 
-        public string RutaImagen1 { get; set; }
-        public string RutaImagen2 { get; set; }
-        public string RutaImagen3 { get; set; }
-        public string RutaImagenCompleta { get; set; }
-        public string RutaCapturaPantalla { get; set; }
+        [JsonPropertyName("image1path")]
+        public string? Image1Path { get; set; }
 
-        [Required(ErrorMessage = "La fecha y hora son requeridas")]
+        [JsonPropertyName("image2path")]
+        public string? Image2Path { get; set; }
+
+        [JsonPropertyName("image3path")]
+        public string? Image3Path { get; set; }
+
+        [JsonPropertyName("imageAllpath")]
+        public string? ImageAllPath { get; set; }
+
+        [JsonPropertyName("screenshot")]
+        public string? ScreenshotPath { get; set; }
+
+        [JsonPropertyName("image1data")]
+        public string? Image1Data { get; set; }
+
+        [JsonPropertyName("image2data")]
+        public string? Image2Data { get; set; }
+
+        [JsonPropertyName("image3data")]
+        public string? Image3Data { get; set; }
+
+        [JsonPropertyName("imageAlldata")]
+        public string? ImageAllData { get; set; }
+
+        [JsonPropertyName("screenshotdata")]
+        public string? ScreenshotData { get; set; }
+
+        [JsonPropertyName("timestamp")]
         [RegularExpression(@"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$",
-            ErrorMessage = "Formato de fecha inválido. Use: yyyy-MM-dd HH:mm:ss")]
-        public string FechaHora { get; set; }
+            ErrorMessage = "Formato inválido. Use: yyyy-MM-dd HH:mm:ss")]
+        public string? Timestamp { get; set; }
 
-        [Required(ErrorMessage = "El número de serie del dispositivo es requerido")]
-        public string NumeroSerieDispositivo { get; set; }
+        [JsonPropertyName("devicesn")]
+        [MaxLength(100, ErrorMessage = "El número de serie no puede exceder 100 caracteres")]
+        public string? DeviceSn { get; set; }
     }
 }

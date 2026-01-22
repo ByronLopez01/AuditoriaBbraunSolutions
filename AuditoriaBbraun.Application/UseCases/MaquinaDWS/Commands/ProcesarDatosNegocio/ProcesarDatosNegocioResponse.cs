@@ -1,20 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace AuditoriaBbraun.Application.UseCases.MaquinaDWS.Commands.ProcesarDatosNegocio
 {
     public class ProcesarDatosNegocioResponse
     {
-        public int Codigo { get; set; }
-        public string Mensaje { get; set; }
-        public DatosRespuesta Datos { get; set; }
+        [JsonPropertyName("code")]
+        public int Code { get; set; }
+
+        [JsonPropertyName("msg")]
+        public string Msg { get; set; } = string.Empty;
+
+        [JsonPropertyName("data")]
+        public DatosRespuesta? Data { get; set; }
 
         public class DatosRespuesta
         {
-            public string Rodillo { get; set; }
+            [JsonPropertyName("roller")]
+            public string? Roller { get; set; }
         }
+
+        public static ProcesarDatosNegocioResponse Ok(string? roller = null) => new()
+        {
+            Code = 200,
+            Msg = "OK",
+            Data = new DatosRespuesta { Roller = roller ?? "router0" }
+        };
+
+        public static ProcesarDatosNegocioResponse Error(int code, string message) => new()
+        {
+            Code = code,
+            Msg = message,
+            Data = null
+        };
     }
 }

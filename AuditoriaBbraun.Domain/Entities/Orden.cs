@@ -1,9 +1,6 @@
 ﻿using AuditoriaBbraun.Domain.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AuditoriaBbraun.Domain.Entities
 {
@@ -16,27 +13,19 @@ namespace AuditoriaBbraun.Domain.Entities
         public EstadoOrden Estado { get; set; } = EstadoOrden.Pendiente;
         public int Prioridad { get; set; } = 1;
         public string? DireccionEnvio { get; set; }
-       // public string? CiudadEnvio { get; set; } validar si se ocupa en bbraun
+        // public string? CiudadEnvio { get; set; } validar si se ocupa en bbraun
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
         public DateTime? FechaCompletada { get; set; }
+        public DateTime? FechaActualizacion { get; set; }
         public decimal? TotalPeso { get; set; }
         public decimal? TotalVolumen { get; set; }
         public int CantidadItems { get; set; } = 0;
         public string? AsignadoA { get; set; }
 
-     
         public virtual Cliente? Cliente { get; set; }
         public virtual Usuario? CreadoPorUsuario { get; set; }
         public virtual Usuario? AsignadoAUsuario { get; set; }
         public virtual ICollection<Transaccion> Transacciones { get; set; } = new List<Transaccion>();
-    }
-
-    public enum EstadoOrden
-    {
-        Pendiente,
-        Procesando,
-        Completada,
-        Cancelada
     }
 }
 

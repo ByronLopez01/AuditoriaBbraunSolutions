@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace AuditoriaBbraun.Application.UseCases.MaquinaDWS.Commands.ProcesarDatosNegocio
 {
@@ -11,32 +6,35 @@ namespace AuditoriaBbraun.Application.UseCases.MaquinaDWS.Commands.ProcesarDatos
     {
         public ProcesarDatosNegocioCommandValidator()
         {
-            RuleFor(x => x.CodigoBarras)
-                .NotEmpty().WithMessage("El código de barras es requerido")
+            RuleFor(x => x.Barcode)
                 .MaximumLength(500).WithMessage("El código de barras no puede exceder 500 caracteres");
 
-            RuleFor(x => x.Peso)
-                .GreaterThan(0).WithMessage("El peso debe ser mayor a cero");
+            RuleFor(x => x.Weight)
+                .GreaterThanOrEqualTo(0).When(x => x.Weight.HasValue)
+                .WithMessage("El peso no puede ser negativo");
 
-            RuleFor(x => x.Largo)
-                .GreaterThan(0).WithMessage("El largo debe ser mayor a cero");
+            RuleFor(x => x.Length)
+                .GreaterThanOrEqualTo(0).When(x => x.Length.HasValue)
+                .WithMessage("El largo no puede ser negativo");
 
-            RuleFor(x => x.Ancho)
-                .GreaterThan(0).WithMessage("El ancho debe ser mayor a cero");
+            RuleFor(x => x.Width)
+                .GreaterThanOrEqualTo(0).When(x => x.Width.HasValue)
+                .WithMessage("El ancho no puede ser negativo");
 
-            RuleFor(x => x.Alto)
-                .GreaterThan(0).WithMessage("El alto debe ser mayor a cero");
+            RuleFor(x => x.Height)
+                .GreaterThanOrEqualTo(0).When(x => x.Height.HasValue)
+                .WithMessage("El alto no puede ser negativo");
 
-            RuleFor(x => x.Volumen)
-                .GreaterThan(0).WithMessage("El volumen debe ser mayor a cero");
+            RuleFor(x => x.Volume)
+                .GreaterThanOrEqualTo(0).When(x => x.Volume.HasValue)
+                .WithMessage("El volumen no puede ser negativo");
 
-            RuleFor(x => x.NumeroSerieDispositivo)
-                .NotEmpty().WithMessage("El número de serie del dispositivo es requerido")
+            RuleFor(x => x.DeviceSn)
                 .MaximumLength(100).WithMessage("El número de serie no puede exceder 100 caracteres");
 
-            RuleFor(x => x.FechaHora)
-                .NotEmpty().WithMessage("La fecha y hora son requeridas")
+            RuleFor(x => x.Timestamp)
                 .Matches(@"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$")
+                .When(x => !string.IsNullOrWhiteSpace(x.Timestamp))
                 .WithMessage("Formato de fecha inválido. Use: yyyy-MM-dd HH:mm:ss");
         }
     }

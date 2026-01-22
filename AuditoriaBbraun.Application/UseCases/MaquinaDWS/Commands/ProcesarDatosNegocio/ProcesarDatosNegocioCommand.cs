@@ -9,18 +9,23 @@ namespace AuditoriaBbraun.Application.UseCases.MaquinaDWS.Commands.ProcesarDatos
 {
     public class ProcesarDatosNegocioCommand : IRequest<ProcesarDatosNegocioResponse>
     {
-        public string CodigoBarras { get; set; }
-        public decimal Peso { get; set; }
-        public decimal Largo { get; set; }
-        public decimal Ancho { get; set; }
-        public decimal Alto { get; set; }
-        public decimal Volumen { get; set; }
-        public string RutaImagen1 { get; set; }
-        public string RutaImagen2 { get; set; }
-        public string RutaImagen3 { get; set; }
-        public string RutaImagenCompleta { get; set; }
-        public string RutaCapturaPantalla { get; set; }
-        public string FechaHora { get; set; }
-        public string NumeroSerieDispositivo { get; set; }
+        public string? Barcode { get; set; }
+        public decimal? Weight { get; set; }
+        public decimal? Length { get; set; }
+        public decimal? Width { get; set; }
+        public decimal? Height { get; set; }
+        public decimal? Volume { get; set; }
+        public string? Image1Path { get; set; }
+        public string? Image2Path { get; set; }
+        public string? Image3Path { get; set; }
+        public string? ImageAllPath { get; set; }
+        public string? ScreenshotPath { get; set; }
+        public string? Image1Data { get; set; }
+        public string? Image2Data { get; set; }
+        public string? Image3Data { get; set; }
+        public string? ImageAllData { get; set; }
+        public string? ScreenshotData { get; set; }
+        public string? Timestamp { get; set; }
+        public string? DeviceSn { get; set; }
     }
 }

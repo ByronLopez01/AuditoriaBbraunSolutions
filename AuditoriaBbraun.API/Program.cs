@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -17,7 +18,6 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -25,7 +25,31 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "AuditoriaBbraun DWSSystem API",
+        Version = "v1"
+    });
+
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Bearer token"
+    };
+    c.AddSecurityDefinition("Bearer", securityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            securityScheme, Array.Empty<string>()
+        }
+    });
+});
 
 builder.Services.AddMediatR(cfg =>
 {
@@ -38,8 +62,6 @@ builder.Services.AddDbContext<ContextApplications>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
-
 
 //CORS policy
 builder.Services.AddCors(options =>
@@ -62,13 +84,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppIdentityDbContext>()
     .AddDefaultTokenProviders();
 
-// Mapear configuración JWT desde appsettings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-
-// Inyectar el Servicio de Autenticación (Interface -> Implementación)
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Configurar la Autenticación JWT (Cómo validar el token)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -89,39 +107,36 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Registro de Unidad de Trabajo
+builder.Services.AddScoped<IUnidadTrabajo, UnidadTrabajo>();
 
 var app = builder.Build();
-
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        // Ejecutamos el sembrador
+        
         await AuditoriaBbraun.Infrastructure.Data.DbSeeder.SeedRolesAndAdminAsync(services);
     }
     catch (Exception ex)
     {
-        // Aquí podrías loguear errores si falla la conexión a BD al iniciar
+        
         Console.WriteLine("Ocurrió un error al insertar datos semilla: " + ex.Message);
     }
 }
 
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Swagger habilitado en todos los entornos
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "AuditoriaBbraun DWSSystem API v1");
+    c.RoutePrefix = "swagger";
+});
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
