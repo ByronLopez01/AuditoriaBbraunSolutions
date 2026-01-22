@@ -1,19 +1,10 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AuditoriaBbraun.Domain.Interfaces;
-using AuditoriaBbraun.Domain.Services;
 using Microsoft.Extensions.Logging;
-using AuditoriaBbraun.Domain.Entities;
 
 namespace AuditoriaBbraun.Application.UseCases.MaquinaDWS.Commands.ProcesarDatosNegocio
 {
     public class ProcesarDatosNegocioCommandHandler : IRequestHandler<ProcesarDatosNegocioCommand, ProcesarDatosNegocioResponse>
     {
-
         private readonly ILogger<ProcesarDatosNegocioCommandHandler> _logger;
 
         public ProcesarDatosNegocioCommandHandler(ILogger<ProcesarDatosNegocioCommandHandler> logger)
@@ -25,55 +16,42 @@ namespace AuditoriaBbraun.Application.UseCases.MaquinaDWS.Commands.ProcesarDatos
         {
             try
             {
-                _logger.LogInformation("Procesando datos de negocio - Dispositivo: {Dispositivo}",
-                    request.NumeroSerieDispositivo);
+                _logger.LogInformation("Procesando datos DWS - Dispositivo: {Dispositivo}, Barcode: {Barcode}",
+                    request.DeviceSn, request.Barcode);
 
-                // Validaciones básicas
-                if (request.Peso <= 0 || request.Largo <= 0 || request.Ancho <= 0 || request.Alto <= 0)
+                if (TieneMedidasNegativas(request))
                 {
-                    return new ProcesarDatosNegocioResponse
-                    {
-                        Codigo = 400,
-                        Mensaje = "Datos de peso/dimensiones inválidos",
-                        Datos = null
-                    };
+                    return ProcesarDatosNegocioResponse.Error(400, "Los valores de peso/dimensiones no pueden ser negativos");
                 }
 
-                
-                string direccionRodillo = DeterminarDireccionRodillo(request.Peso, request.Volumen);
+                var roller = DeterminarDireccionRodillo(request.Weight, request.Volume);
 
-                
-                await Task.Delay(10, cancellationToken);
+                await Task.CompletedTask;
 
-               
-                return new ProcesarDatosNegocioResponse
-                {
-                    Codigo = 200,
-                    Mensaje = "OK",
-                    Datos = new ProcesarDatosNegocioResponse.DatosRespuesta
-                    {
-                        Rodillo = direccionRodillo
-                    }
-                };
+                return ProcesarDatosNegocioResponse.Ok(roller);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en ProcesarDatosNegocioCommandHandler");
-                return new ProcesarDatosNegocioResponse
-                {
-                    Codigo = 500,
-                    Mensaje = "Error interno al procesar datos",
-                    Datos = null
-                };
+                return ProcesarDatosNegocioResponse.Error(500, "Error interno al procesar datos");
             }
         }
 
-            private string DeterminarDireccionRodillo(decimal peso, decimal volumen)
+        private static bool TieneMedidasNegativas(ProcesarDatosNegocioCommand request) =>
+            (request.Weight.HasValue && request.Weight.Value < 0) ||
+            (request.Length.HasValue && request.Length.Value < 0) ||
+            (request.Width.HasValue && request.Width.Value < 0) ||
+            (request.Height.HasValue && request.Height.Value < 0) ||
+            (request.Volume.HasValue && request.Volume.Value < 0);
+
+        private static string DeterminarDireccionRodillo(decimal? weight, decimal? volume)
         {
+            var peso = weight ?? 0;
+            var vol = volume ?? 0;
 
             if (peso > 50) return "exitport1";
-            if (volumen > 100) return "router2";
-            if (peso > 20 && volumen > 50) return "router1";
+            if (vol > 100) return "router2";
+            if (peso > 20 && vol > 50) return "router1";
 
             return "router0";
         }

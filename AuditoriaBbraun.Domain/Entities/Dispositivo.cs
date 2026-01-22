@@ -15,7 +15,8 @@ namespace AuditoriaBbraun.Domain.Entities
         public TipoDispositivo Tipo { get; set; }
         public string? Ubicacion { get; set; }
         public EstadoDispositivo Estado { get; set; } = EstadoDispositivo.Activo;
-        public string? UsuarioId { get; set; } // Responsable
+        public bool Activo { get; set; } = true;
+        public string? UsuarioId { get; set; }
         public string? Configuracion { get; set; }
         public virtual Usuario? Usuario { get; set; }
         public virtual Usuario? CreadoPorUsuario { get; set; }
