@@ -5,81 +5,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AuditoriaBbraun.Domain.Entities
 {
-    public class Transaccion : IEntidadAgregado
+    public class Transaccion : BaseEntity
     {
-        public int Id { get; private set; }
-        public string CodigoBarras { get; private set; }
-        public decimal Peso { get; private set; } // en kg
-        public decimal Largo { get; private set; } // en cm
-        public decimal Ancho { get; private set; } // en cm
-        public decimal Alto { get; private set; } // en cm
-        public decimal Volumen { get; private set; } // en cm3
-        public string NumeroSerieDispositivo { get; private set; }
-        public DateTime FechaHora { get; private set; }
-        public string RutaImagen1 { get; private set; }
-        public string RutaImagen2 { get; private set; }
-        public string RutaImagen3 { get; private set; }
-        public string RutaImagenCompleta { get; private set; }
-        public string RutaCapturaPantalla { get; private set; }
-        public DateTime FechaCreacion { get; private set; }
+        public long Id { get; set; }
+        public string CodigoBarras { get; set; } = string.Empty;
+        public decimal Peso { get; set; } // en kg
+        public decimal Largo { get; set; } // en cm
+        public decimal Ancho { get; set; } // en cm
+        public decimal Alto { get; set; } // en cm
+        public decimal Volumen { get; set; } // en cm³
+        public string DireccionRodillo { get; set; } = string.Empty;
 
-       
-        private Transaccion() { }
+        // Relación con dispositivo
+        public int DispositivoId { get; set; }
+        public string NumeroSerieDispositivo { get; set; } = string.Empty;
 
-        public static Transaccion Crear(string codigoBarras,decimal peso,decimal largo,decimal ancho,decimal alto,string numeroSerieDispositivo,string rutaImagen1 = null,string rutaImagen2 = null,string rutaImagen3 = null,string rutaImagenCompleta = null,string rutaCapturaPantalla = null)
-        {
-            if (string.IsNullOrWhiteSpace(codigoBarras))
-                throw new ArgumentException("El código de barras es requerido", nameof(codigoBarras));
+        // Rutas de imágenes
+        public string? RutaImagen1 { get; set; }
+        public string? RutaImagen2 { get; set; }
+        public string? RutaImagen3 { get; set; }
+        public string? RutaImagenCompleta { get; set; }
+        public string? RutaCapturaPantalla { get; set; }
 
-            if (peso <= 0)
-                throw new PesoInvalidoExcepcion("El peso debe ser mayor a cero");
+        
+        public DateTime FechaHora { get; set; } // Fecha de la transacción
+        public DateTime FechaRecepcion { get; set; } = DateTime.UtcNow; // Fecha que llegó a la API
+        public EstadoTransaccion Estado { get; set; } = EstadoTransaccion.Procesado;
+        public string? MensajeError { get; set; }
 
-            if (string.IsNullOrEmpty(codigoBarras))
-                throw new ArgumentException("El código de barras es requerido");
+        // Relación con orden 
+        public int? OrdenId { get; set; }
 
-            return new Transaccion
-            {
-                CodigoBarras = codigoBarras,
-                Peso = peso,
-                Largo = largo,
-                Ancho = ancho,
-                Alto = alto,
-                Volumen = CalcularVolumen(largo, ancho, alto),
-                NumeroSerieDispositivo = numeroSerieDispositivo,
-                RutaImagen1 = rutaImagen1,
-                RutaImagen2 = rutaImagen2,
-                RutaImagen3 = rutaImagen3,
-                RutaImagenCompleta = rutaImagenCompleta,
-                RutaCapturaPantalla = rutaCapturaPantalla,
-                FechaHora = DateTime.UtcNow,
-                FechaCreacion = DateTime.UtcNow
-            };
-        }
+      
+        public virtual Dispositivo? Dispositivo { get; set; }
+        public virtual Orden? Orden { get; set; }
+        public virtual Usuario? CreadoPorUsuario { get; set; }
+        public virtual ICollection<Imagen> Imagenes { get; set; } = new List<Imagen>();
+    }
 
-        private static decimal CalcularVolumen(decimal largo, decimal ancho, decimal alto)
-        {
-            return Math.Round(largo * ancho * alto, 2);
-        }
-
-        public void ActualizarRutasImagenes(string rutaImagen1 = null,string rutaImagen2 = null,string rutaImagen3 = null,string rutaImagenCompleta = null,string rutaCapturaPantalla = null)
-        {
-            if (!string.IsNullOrWhiteSpace(rutaImagen1))
-                RutaImagen1 = rutaImagen1;
-
-            if (!string.IsNullOrWhiteSpace(rutaImagen2))
-                RutaImagen2 = rutaImagen2;
-
-            if (!string.IsNullOrWhiteSpace(rutaImagen3))
-                RutaImagen3 = rutaImagen3;
-
-            if (!string.IsNullOrWhiteSpace(rutaImagenCompleta))
-                RutaImagenCompleta = rutaImagenCompleta;
-
-            if (!string.IsNullOrWhiteSpace(rutaCapturaPantalla))
-                RutaCapturaPantalla = rutaCapturaPantalla;
-        }
+    public enum EstadoTransaccion
+    {
+        Procesado,
+        Error,
+        Pendiente
     }
 }
+
