@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using AuditoriaBbraun.Application.Constants
+@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid nav-header">
         <div class="brand-inline">
             <img src="/img/b-braun-logo-small.png" alt="B. Braun" class="brand-mark-img" />
@@ -13,15 +16,71 @@
 <input type="checkbox" title="Menú de navegación" class="navbar-toggler" aria-label="Alternar menú" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <!-- DEFINIR QUE PAGINAS UTILIZAREMOS, REVISAR NOMBRES Y FUNCIONALIDADES DE CADA UNA. -->
+    <!-- DEFINIR QUE ROLES TENDRAN ACCESO A CUALES. -->
+    <!-- ETC. (ARCHIVO DE PENDIENTE REVISION)-->
     <nav class="flex-column">
-        <div class="nav-section">General</div>
-
+        <!-- SECCIÓN PÚBLICA / HOME -->
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Panel
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Panel General
             </NavLink>
         </div>
+        <!-- SECCIÓN PROCESO (Visible para Admin y Operario) -->
+        <AuthorizeView Roles="Admin, Operario">
+            <div class="nav-section mt-2 px-3 text-uppercase small text-muted">Proceso</div>
 
+            <div class="nav-item px-3">
+                <!-- Apuntamos al archivo Pages/Proceso/Monitor.razor -->
+                <NavLink class="nav-link" href="proceso/monitor">
+                    <span class="bi bi-display me-2" aria-hidden="true"></span> Monitor
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <!-- Apuntamos al archivo Pages/Proceso/Estadisticas.razor -->
+                <NavLink class="nav-link" href="proceso/estadisticas">
+                    <span class="bi bi-bar-chart-line me-2" aria-hidden="true"></span> Estadísticas
+                </NavLink>
+            </div>
+        </AuthorizeView>
+
+        <!-- SECCIÓN AUDITORIA (Visible para Admin y Auditor) -->
+        <AuthorizeView Roles="Admin, Auditor">
+            <div class="nav-section mt-2 px-3 text-uppercase small text-muted">Auditoría</div>
+
+            <div class="nav-item px-3">
+                <!-- Apuntamos al archivo Pages/Auditoria/Pendientes.razor -->
+                <NavLink class="nav-link" href="auditoria/pendientes">
+                    <span class="bi bi-clipboard-check me-2" aria-hidden="true"></span> Pendientes
+                </NavLink>
+            </div>
+            <!-- ¿ agregar index y detalle? -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="auditoria">
+                    <span class="bi bi-list-ul me-2" aria-hidden="true"></span> HistóricoTEST
+                </NavLink>
+            </div>
+            <!-- revisar, agregar más?-->
+        </AuthorizeView>
+
+        <!-- SECCIÓN CONFIG (Solo Admin) -->
+        <AuthorizeView Roles="Admin">
+            <div class="nav-section mt-2 px-3 text-uppercase small text-muted">Configuración</div>
+
+            <div class="nav-item px-3">
+                <!-- Apuntamos al archivo Pages/Config/Red.razor -->
+                <NavLink class="nav-link" href="config/red">
+                    <span class="bi bi-hdd-network me-2" aria-hidden="true"></span> Config. Red
+                </NavLink>
+            </div>
+        </AuthorizeView>
+
+
+
+
+        <div class="nav-section mt-2 px-3 text-uppercase small text-muted">Tests</div>
+        <!-- links de TEST (borrar) -->
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="counter">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Contador
@@ -33,5 +92,7 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Clima
             </NavLink>
         </div>
+        <!-- links de TEST (borrar) -->
+
     </nav>
 </div>

@@ -1,6 +1,31 @@
-﻿<Router AppAssembly="typeof(Program).Assembly">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using AuditoriaBbraun.BlazorWeb.Components.Layout
+
+<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+            <NotAuthorized>
+                @if (context.User.Identity?.IsAuthenticated == false)
+                {
+                    <RedirectToLogin />
+                }
+                else
+                {
+                    <div class="p-4 text-center">
+                        <h3>Acceso Denegado</h3>
+                        <p>No tienes el Rol necesario para ver esta sección.</p>
+                        <a href="/">Volver al Inicio</a>
+                    </div>
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(MainLayout)">
+            <div class="p-4">
+                <p>Lo sentimos, no hay nada en esta dirección.</p>
+            </div>
+        </LayoutView>
+    </NotFound>
 </Router>

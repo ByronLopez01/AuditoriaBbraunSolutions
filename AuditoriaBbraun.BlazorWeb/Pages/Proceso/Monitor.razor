@@ -1,4 +1,8 @@
-﻿<h3>Monitor</h3>
+﻿@page "/proceso/monitor"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin, Operario")]
+
+<h3>Monitor</h3>
 
 @code {
 

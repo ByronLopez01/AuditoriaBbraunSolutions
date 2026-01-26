@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Components.Web
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -10,11 +12,11 @@
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="AuditoriaBbraun.BlazorWeb.styles.css" />
     <link rel="icon" type="image/png" href="img/b-braun-logo-small.png" />
-    <HeadOutlet />
+    <HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)"/>
 </head>
 
 <body>
-    <Routes />
+    <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)"/>
     <script src="_framework/blazor.web.js"></script>
 </body>
 

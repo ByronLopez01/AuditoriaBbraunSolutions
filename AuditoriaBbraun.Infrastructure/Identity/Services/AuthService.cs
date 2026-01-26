@@ -27,7 +27,7 @@ namespace AuditoriaBbraun.Infrastructure.Identity.Services
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            var user = await _userManager.FindByNameAsync(request.UserName);
             if (user == null)
             {
                 return new AuthResponse { Success = false, Message = "Usuario no encontrado." };

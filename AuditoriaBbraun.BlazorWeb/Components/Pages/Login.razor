@@ -1,10 +1,13 @@
-﻿@page "/login"
-@page "/"
-@rendermode InteractiveServer
+﻿@page "/"
+@page "/login"
 @layout AuditoriaBbraun.BlazorWeb.Components.Layout.LoginLayout
-@inject HttpClient Http
-@inject NavigationManager Nav
+
+@using AuditoriaBbraun.Application.DTOs.Account
+@using AuditoriaBbraun.BlazorWeb.Services.Authentication
 @using System.ComponentModel.DataAnnotations
+
+@inject IAuthClientService AuthService
+@inject NavigationManager Nav
 
 <PageTitle>Iniciar sesión</PageTitle>
 
@@ -26,8 +29,8 @@
             <div class="form-grid">
                 <div>
                     <label for="username" class="form-label">Usuario</label>
-                    <InputText id="username" class="form-control" @bind-Value="_model.Username" />
-                    <ValidationMessage For="@(() => _model.Username)" class="text-danger" />
+                    <InputText id="username" class="form-control" @bind-Value="_model.UserName" />
+                    <ValidationMessage For="@(() => _model.UserName)" class="text-danger" />
                 </div>
                 <div>
                     <label for="password" class="form-label">Contraseña</label>
@@ -54,10 +57,11 @@
 
 @code {
     private readonly LoginRequest _model = new();
+
     private bool _loading;
     private string? _statusMessage;
     private string _statusClass = "text-muted";
-    private string _loginButtonText => _loading ? "Ingresando..." : "Iniciar sesión";
+    private string _loginButtonText => _loading ? "Verificando..." : "Iniciar sesión";
 
     private async Task HandleLogin()
     {
@@ -65,43 +69,29 @@
         _statusMessage = null;
         _statusClass = "text-muted";
 
-        // Demo local: valida campos y redirige.
-        await Task.Delay(200);
-
-        if (string.IsNullOrWhiteSpace(_model.Username) || string.IsNullOrWhiteSpace(_model.Password))
+        try
         {
-            _statusMessage = "Usuario y contraseña son obligatorios.";
-            _statusClass = "text-danger";
-            _loading = false;
-            return;
+            // Servicio de Autenticación
+            var response = await AuthService.Login(_model);
+
+            if (response.Success)
+            {
+                Nav.NavigateTo("home", forceLoad: false);
+            }
+            else
+            {
+                _statusMessage = response.Message ?? "Usuario o contraseña inválidos.";
+                _statusClass = "text-danger";
+            }
         }
-
-        _statusMessage = $"Bienvenido, {_model.Username} (demo).";
-        _statusClass = "text-success";
-        _loading = false;
-
-        Nav.NavigateTo("/home", forceLoad: true);
-    }
-
-    public class LoginRequest
-    {
-        [Required(ErrorMessage = "El usuario es obligatorio")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Mínimo 3 caracteres")]
-        public string Username { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "La contraseña es obligatoria")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Mínimo 6 caracteres")]
-        public string Password { get; set; } = string.Empty;
-    }
-
-    public class AuthResponse
-    {
-        public string Id { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Rol { get; set; } = string.Empty;
-        public string Token { get; set; } = string.Empty;
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
+        catch (Exception)
+        {
+            _statusMessage = "No se pudo conectar con el servidor.";
+            _statusClass = "text-danger";
+        }
+        finally
+        {
+            _loading = false;
+        }
     }
 }

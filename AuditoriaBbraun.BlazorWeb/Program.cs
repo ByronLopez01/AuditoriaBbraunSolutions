@@ -1,4 +1,8 @@
 using AuditoriaBbraun.BlazorWeb.Components;
+using AuditoriaBbraun.BlazorWeb.Services.Authentication;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +17,32 @@ builder.Services.AddHttpClient("api", client =>
     var baseUrl = builder.Configuration["ApiBaseUrl"] ?? "/";
     client.BaseAddress = new Uri(baseUrl, UriKind.RelativeOrAbsolute);
 });
+
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("api"));
+
+// Guardar token
+builder.Services.AddBlazoredLocalStorage();
+
+// Sistema de autorización base de .NET
+builder.Services.AddAuthorizationCore();
+builder.Services.AddCascadingAuthenticationState();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+    options.LoginPath = "/login";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+});
+
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+
+// Servicio de Login
+builder.Services.AddScoped<IAuthClientService, AuthClientService>();
+
 
 var app = builder.Build();
 

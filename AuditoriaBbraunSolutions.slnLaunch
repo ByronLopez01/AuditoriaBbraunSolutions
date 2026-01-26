@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "API + WEB",
+    "Projects": [
+      {
+        "Path": "AuditoriaBbraun.API\\AuditoriaBbraun.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AuditoriaBbraun.BlazorWeb\\AuditoriaBbraun.BlazorWeb.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

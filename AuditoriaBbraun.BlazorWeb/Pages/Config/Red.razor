@@ -1,4 +1,8 @@
-﻿<h3>Red</h3>
+﻿@page "/config/red"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Red</h3>
 
 @code {
 

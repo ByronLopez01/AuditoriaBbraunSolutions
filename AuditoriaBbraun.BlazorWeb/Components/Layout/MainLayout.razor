@@ -1,4 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@using AuditoriaBbraun.BlazorWeb.Services.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthClientService AuthService
+@inject NavigationManager Navigation
 
 <div class="page">
     <aside class="sidebar">
@@ -15,9 +19,19 @@
                 </div>
             </div>
             <div class="top-actions">
-                <a class="link-muted" href="https://learn.microsoft.com/aspnet/core/" target="_blank" rel="noreferrer">
-                    Documentación
-                </a>
+                <AuthorizeView>
+                    <Authorized>
+                        <!-- Se muestra solo si hay un usuario Logueado -->
+                        <span class="me-3 fw-bold">@context.User.Identity?.Name</span>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="CerrarSesion">
+                            Salir
+                        </button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <!-- Si no hay un usuario Logueado -->
+                        <a href="login" class="btn btn-primary btn-sm">Acceder</a>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </header>
 
@@ -32,3 +46,12 @@
     <a href="" class="reload">Recargar</a>
     <a class="dismiss" aria-label="Cerrar">🗙</a>
 </div>
+
+@code {
+    private async Task CerrarSesion()
+    {
+        await AuthService.Logout();
+        // Forzamos recarga para limpiar estado y volver al login
+        Navigation.NavigateTo("login", forceLoad: true);
+    }
+}
