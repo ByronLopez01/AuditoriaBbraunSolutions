@@ -8,6 +8,7 @@
 
 @inject IAuthClientService AuthService
 @inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Iniciar sesión</PageTitle>
 
@@ -62,6 +63,32 @@
     private string? _statusMessage;
     private string _statusClass = "text-muted";
     private string _loginButtonText => _loading ? "Verificando..." : "Iniciar sesión";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            var returnUrl = GetReturnUrl();
+
+            Nav.NavigateTo(returnUrl, forceLoad: false);
+        }
+    }
+
+    private string GetReturnUrl()
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+
+        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var url))
+        {
+            return url.ToString();
+        }
+
+        return "home";
+    }
 
     private async Task HandleLogin()
     {

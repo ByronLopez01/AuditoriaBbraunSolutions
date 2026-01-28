@@ -1,4 +1,8 @@
-﻿<h3>Detalle</h3>
+﻿@page "/auditoria/detalle"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin, Auditor")]
+
+<h3>Detalle</h3>
 
 @code {
 

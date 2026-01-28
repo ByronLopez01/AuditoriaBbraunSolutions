@@ -49,19 +49,28 @@
         <AuthorizeView Roles="Admin, Auditor">
             <div class="nav-section mt-2 px-3 text-uppercase small text-muted">Auditoría</div>
 
-            <div class="nav-item px-3">
-                <!-- Apuntamos al archivo Pages/Auditoria/Pendientes.razor -->
-                <NavLink class="nav-link" href="auditoria/pendientes">
-                    <span class="bi bi-clipboard-check me-2" aria-hidden="true"></span> Pendientes
-                </NavLink>
-            </div>
-            <!-- ¿ agregar index y detalle? -->
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="auditoria">
-                    <span class="bi bi-list-ul me-2" aria-hidden="true"></span> HistóricoTEST
-                </NavLink>
-            </div>
-            <!-- revisar, agregar más?-->
+                <div class="nav-item px-3">
+                    <!-- Apuntamos al archivo Pages/Auditoria/Pendientes.razor -->
+                    <NavLink class="nav-link" href="auditoria/pendientes">
+                        <span class="bi bi-clipboard-check me-2" aria-hidden="true"></span> Pendientes
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <!-- Apuntamos al archivo Pages/Auditoria -->
+                    <!-- (index.razor) -->
+                    <NavLink class="nav-link" href="auditoria" Match="NavLinkMatch.All">
+                        <span class="bi bi-list-ul me-2" aria-hidden="true"></span> Histórico
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <!-- Apuntamos al archivo Pages/Auditoria/Detalle.razor -->
+                    <NavLink class="nav-link" href="auditoria/detalle">
+                        <span class="bi bi-file-earmark-text me-2" aria-hidden="true"></span> Detalle
+                    </NavLink>
+                </div>
+
         </AuthorizeView>
 
         <!-- SECCIÓN CONFIG (Solo Admin) -->
@@ -78,9 +87,8 @@
 
 
 
-
-        <div class="nav-section mt-2 px-3 text-uppercase small text-muted">Tests</div>
         <!-- links de TEST (borrar) -->
+        <div class="nav-section mt-2 px-3 text-uppercase small text-muted">Tests</div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="counter">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Contador
