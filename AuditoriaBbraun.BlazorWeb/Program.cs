@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents(options =>
+    {
+        options.DetailedErrors = true;
+    });
 
 // HttpClient hacia la API
 // Ajustar ApiBaseUrl en appsettings.json para cambiar el endpoint o puerto de la API!!!!!
