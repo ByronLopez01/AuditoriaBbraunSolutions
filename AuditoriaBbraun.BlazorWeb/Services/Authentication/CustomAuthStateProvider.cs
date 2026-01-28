@@ -59,12 +59,12 @@ namespace AuditoriaBbraun.BlazorWeb.Services.Authentication
             }
 
             var user = new ClaimsPrincipal(identity);
-            var state = new AuthenticationState(user);
+          //  var state = new AuthenticationState(user);
 
             // Devolvemos el estado a Blazor (Logueado o Anonimo)
-            NotifyAuthenticationStateChanged(Task.FromResult(state));
+          //  NotifyAuthenticationStateChanged(Task.FromResult(state));
 
-            return state;
+            return new AuthenticationState(user);
         }
 
         // Metodo publico para avisar login exitoso
