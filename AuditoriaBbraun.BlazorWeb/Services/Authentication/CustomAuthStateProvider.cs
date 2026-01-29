@@ -59,10 +59,6 @@ namespace AuditoriaBbraun.BlazorWeb.Services.Authentication
             }
 
             var user = new ClaimsPrincipal(identity);
-          //  var state = new AuthenticationState(user);
-
-            // Devolvemos el estado a Blazor (Logueado o Anonimo)
-          //  NotifyAuthenticationStateChanged(Task.FromResult(state));
 
             return new AuthenticationState(user);
         }
@@ -97,36 +93,46 @@ namespace AuditoriaBbraun.BlazorWeb.Services.Authentication
         // ==========================================
         private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
+            var claims = new List<Claim>();
             var payload = jwt.Split('.')[1];
             var jsonBytes = ParseBase64WithoutPadding(payload);
+
+            // Permitimos que el diccionario sea nullable
             var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
-            var claims = new List<Claim>();
-
-            if (keyValuePairs != null)
+            // Si es nulo, devolvemos lista vacia
+            if (keyValuePairs == null)
             {
-                keyValuePairs.TryGetValue("role", out object roles);
+                return claims;
+            }
 
-                if (roles != null)
+            keyValuePairs.TryGetValue("role", out object? roles); // object? nullable
+
+            if (roles != null)
+            {
+                if (roles.ToString()!.Trim().StartsWith("[")) // ! asegura no nulo
                 {
-                    if (roles.ToString().Trim().StartsWith("["))
+                    var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString()!);
+                    if (parsedRoles != null)
                     {
-                        var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString());
                         foreach (var parsedRole in parsedRoles)
                         {
                             claims.Add(new Claim(ClaimTypes.Role, parsedRole));
                         }
                     }
-                    else
-                    {
-                        claims.Add(new Claim(ClaimTypes.Role, roles.ToString()));
-                    }
-
-                    keyValuePairs.Remove(ClaimTypes.Role);
+                }
+                else
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, roles.ToString()!));
                 }
 
-                claims.AddRange(keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString())));
+                keyValuePairs.Remove(ClaimTypes.Role);
             }
+
+            // Aseguramos conversion a string segura
+            claims.AddRange(keyValuePairs
+                .Where(kvp => kvp.Value != null)
+                .Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()!)));
 
             return claims;
         }

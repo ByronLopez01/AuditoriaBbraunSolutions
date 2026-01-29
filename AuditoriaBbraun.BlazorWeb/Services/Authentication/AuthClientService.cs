@@ -44,5 +44,43 @@ namespace AuditoriaBbraun.BlazorWeb.Services.Authentication
             await _localStorage.RemoveItemAsync("accessToken");
             ((CustomAuthStateProvider)_authStateProvider).NotifyUserLogout();
         }
+
+
+        // Implementacion del Registro (enviado con Token de Admin en el HttpClient)
+        public async Task<AuthResponse> Register(RegisterRequest registerRequest)
+        {
+            var result = await _httpClient.PostAsJsonAsync("/api/Account/register", registerRequest);
+            return await result.Content.ReadFromJsonAsync<AuthResponse>();
+        }
+
+        public async Task<List<UserDto>> GetUsers()
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<UserDto>>("/api/Account/users");
+            return result ?? new List<UserDto>();
+        }
+
+        public async Task<List<string>> GetRoles()
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<string>>("/api/Account/roles");
+            return result ?? new List<string>();
+        }
+
+        public async Task<UserDto> GetUserById(string id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<UserDto>($"/api/Account/users/{id}");
+            return result ?? throw new Exception("No se pudo obtener el usuario.");
+        }
+
+        public async Task<AuthResponse> UpdateUser(UpdateUserRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync("/api/Account/users", request);
+            return await result.Content.ReadFromJsonAsync<AuthResponse>();
+        }
+
+        public async Task<AuthResponse> DeleteUser(string id)
+        {
+            var result = await _httpClient.DeleteAsync($"/api/Account/users/{id}");
+            return await result.Content.ReadFromJsonAsync<AuthResponse>();
+        }
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace AuditoriaBbraun.Domain.Entities
 {
+    // ANALISAR ARCHIVO. NO CORRESPONDE CON LA TABLA USUARIO EN SQL, CUAL ES LA FUNCION DE ESTE ARCHIVO?
     public class Usuario : IdentityUser 
     {
         public string? NombreCompleto { get; set; }
@@ -21,4 +22,5 @@ namespace AuditoriaBbraun.Domain.Entities
         public virtual ICollection<Orden> OrdenesCreadas { get; set; } = new List<Orden>();
         public virtual ICollection<Orden> OrdenesAsignadas { get; set; } = new List<Orden>();
     }
+    // ANALISAR ARCHIVO. NO CORRESPONDE CON LA TABLA USUARIO EN SQL, CUAL ES LA FUNCION DE ESTE ARCHIVO?
 }

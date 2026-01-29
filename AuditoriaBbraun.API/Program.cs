@@ -1,4 +1,4 @@
-using AuditoriaBbraun.Application.Contracts.Identity;
+using AuditoriaBbraun.Application.Interfaces.Identity;
 using AuditoriaBbraun.Application.UseCases.MaquinaDWS.Commands.ProcesarDatosNegocio;
 using AuditoriaBbraun.Domain.Interfaces;
 using AuditoriaBbraun.Infrastructure.Data;
@@ -103,7 +103,7 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero,
         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"] ?? throw new InvalidOperationException("JwtSettings:Key no configurada")))
     };
 });
 

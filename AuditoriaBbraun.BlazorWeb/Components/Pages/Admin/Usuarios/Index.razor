@@ -1,0 +1,136 @@
+﻿@page "/admin/usuarios"
+@using AuditoriaBbraun.Application.DTOs.Account
+@using AuditoriaBbraun.BlazorWeb.Services.Authentication
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@inject IAuthClientService AuthService
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>Gestión de Usuarios</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color: var(--brand-700);">Usuarios</h1>
+        <p class="text-muted mb-0">Administración de cuentas y permisos de acceso.</p>
+    </div>
+    <a href="admin/usuarios/crear" class="btn btn-primary">
+        <i class="bi bi-person-plus-fill me-2"></i>Nuevo Usuario
+    </a>
+</div>
+
+@if (_cargando)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="text-muted mt-2">Cargando usuarios...</p>
+    </div>
+}
+else if (_usuarios.Count == 0)
+{
+    <div class="card text-center p-5">
+        <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+        <h3 class="mt-3">No hay usuarios registrados</h3>
+        <p class="text-muted">Comienza registrando al primer usuario del sistema.</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Usuario / Email</th>
+                        <th>Nombre Completo</th>
+                        <th>Rol</th>
+                        <th class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in _usuarios)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold">@user.UserName</div>
+                                <div class="small text-muted">@user.Email</div>
+                            </td>
+                            <td class="align-middle">@user.Nombre</td>
+                            <td class="align-middle">
+                                <span class="badge @GetRolBadgeClass(user.Rol)">
+                                    @user.Rol
+                                </span>
+                            </td>
+                            <td class="text-end pe-4 align-middle">
+                                <a href="admin/usuarios/editar/@user.Id" class="btn btn-ghost btn-sm me-1" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <!-- Evitamos que se borre a sí mismo o al admin principal si se requiere -->
+                                <button class="btn btn-outline-danger btn-sm" @onclick="() => ConfirmarEliminacion(user)" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    private List<UserDto> _usuarios = new();
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUsuarios();
+    }
+
+    private async Task CargarUsuarios()
+    {
+        _cargando = true;
+        try
+        {
+            _usuarios = await AuthService.GetUsers();
+        }
+        catch (Exception)
+        {
+            // Manejo silencioso o notificación toast si existiera
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private string GetRolBadgeClass(string rol)
+    {
+        return rol switch
+        {
+            "Admin" => "warning", // Naranja para admin
+            "Auditor" => "info",    // Azul para auditor
+            "Operario" => "success", // Verde para operario
+            _ => "secondary"
+        };
+    }
+
+    private async Task ConfirmarEliminacion(UserDto user)
+    {
+        bool confirmado = await JS.InvokeAsync<bool>("confirm", $"¿Estás seguro de eliminar al usuario {user.UserName}?");
+        if (confirmado)
+        {
+            var resultado = await AuthService.DeleteUser(user.Id);
+            if (resultado.Success)
+            {
+                await CargarUsuarios();
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Error al eliminar: " + resultado.Message);
+            }
+        }
+    }
+}

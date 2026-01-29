@@ -1,6 +1,7 @@
 ﻿using AuditoriaBbraun.Application.Constants;
 using AuditoriaBbraun.Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace AuditoriaBbraun.Infrastructure.Data
 {
@@ -11,6 +12,17 @@ namespace AuditoriaBbraun.Infrastructure.Data
             // Obtener gestores de usuarios y roles
             var userManager = service.GetService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;
             var roleManager = service.GetService(typeof(RoleManager<IdentityRole>)) as RoleManager<IdentityRole>;
+
+            var loggerFactory = service.GetService(typeof(ILoggerFactory)) as ILoggerFactory;
+            var logger = loggerFactory?.CreateLogger("DbSeeder");
+
+            // VALIDACIÓN DE NULOS
+            if (userManager == null || roleManager == null)
+            {
+                logger?.LogCritical("ERROR: No se pudieron resolver los servicios de Identity (UserManager o RoleManager). El sembrado de datos no se ejecutara.");
+
+                return;
+            }
 
             // 1. Crear Roles si no existen
             await CreateRoleAsync(roleManager, CustomRoles.Admin);
