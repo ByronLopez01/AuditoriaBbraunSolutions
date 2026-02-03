@@ -93,7 +93,7 @@ namespace AuditoriaBbraun.Infrastructure.Identity.Services
         private async Task<AuthResponse> GenerateAuthResponseAsync(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.Key);
 
             // Obtenemos los roles del usuario para meterlos en el token
             var roles = await _userManager.GetRolesAsync(user);
@@ -177,6 +177,16 @@ namespace AuditoriaBbraun.Infrastructure.Identity.Services
                 return new AuthResponse { Success = false, Message = "Usuario no encontrado." };
             }
 
+            // SEGURIDAD, NO BORRAR ULTIMO ADMIN
+            if (user.Rol == "Admin")
+            {
+                var admins = await _userManager.GetUsersInRoleAsync("Admin");
+                if (admins.Count <= 1)
+                {
+                    return new AuthResponse { Success = false, Message = "No se puede eliminar al último administrador del sistema." };
+                }
+            }
+
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
@@ -219,6 +229,15 @@ namespace AuditoriaBbraun.Infrastructure.Identity.Services
             // Verificamos si el rol cambió respecto al que tiene guardado
             if (user.Rol != request.Rol)
             {
+                // SEGURIDAD, NO BORRAR ULTIMO ADMIN
+                if (user.Rol == "Admin")
+                {
+                    var admins = await _userManager.GetUsersInRoleAsync("Admin");
+                    if (admins.Count <= 1)
+                    {
+                        return new AuthResponse { Success = false, Message = "No se puede quitar el rol de administrador al único usuario que lo posee." };
+                    }
+                }
                 // Remover roles anteriores de Identity
                 var currentRoles = await _userManager.GetRolesAsync(user);
                 if (currentRoles.Any())

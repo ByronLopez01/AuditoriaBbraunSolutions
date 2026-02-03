@@ -19,16 +19,15 @@ namespace AuditoriaBbraun.BlazorWeb.Services.Authentication
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             string token = "";
-            Console.WriteLine("DEBUG: Iniciando GetAuthenticationStateAsync...");
+
             try
             {
                 // Buscamos si existe un token guardado
-                token = await _localStorageService.GetItemAsStringAsync("accessToken");
-                Console.WriteLine($"DEBUG: Token leído de LocalStorage: {(string.IsNullOrEmpty(token) ? "VACIO" : "ENCONTRADO")}");
+                token = await _localStorageService.GetItemAsync<string>("accessToken");    
             }
             catch (InvalidOperationException)
             {
-                Console.WriteLine("DEBUG: Error JS Interop (Prerendering), ignorando.");
+
             }
 
             var identity = new ClaimsIdentity();

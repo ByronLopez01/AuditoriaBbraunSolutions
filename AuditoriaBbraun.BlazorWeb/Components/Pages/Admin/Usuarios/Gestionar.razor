@@ -1,0 +1,235 @@
+﻿@page "/admin/usuarios/crear"
+@page "/admin/usuarios/editar/{UserId}"
+
+@using AuditoriaBbraun.Application.DTOs.Account
+@using AuditoriaBbraun.BlazorWeb.Services.Authentication
+@using Microsoft.AspNetCore.Authorization
+@using System.ComponentModel.DataAnnotations
+
+@attribute [Authorize(Roles = "Admin")]
+@inject IAuthClientService AuthService
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>@(EsEdicion ? "Editar Usuario" : "Nuevo Usuario")</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color: var(--brand-700);">
+            @(EsEdicion ? "Editar Usuario" : "Nuevo Usuario")
+        </h1>
+        <p class="text-muted mb-0">
+            @(EsEdicion ? "Modifica los datos y permisos del usuario." : "Registra un nuevo usuario en el sistema.")
+        </p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4">
+            @if (_cargando)
+            {
+                <div class="text-center py-4">
+                    <div class="spinner-border text-success" role="status"></div>
+                    <p class="mt-2 text-muted">Cargando información...</p>
+                </div>
+            }
+            else
+            {
+                <EditForm Model="_modelo" OnValidSubmit="GuardarCambios" autocomplete="off">
+                    <DataAnnotationsValidator />
+
+                    @if (!string.IsNullOrEmpty(_mensajeError))
+                    {
+                        <div class="alert alert-danger mb-3">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>@_mensajeError
+                        </div>
+                    }
+
+                    <div class="row g-3">
+                        <!-- Nombre completo -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Nombre Completo</label>
+                            <InputText @bind-Value="_modelo.Nombre" class="form-control" placeholder="Ej: Juan Pérez" />
+                            <ValidationMessage For="() => _modelo.Nombre" class="text-danger small" />
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Correo Electrónico</label>
+                            <InputText @bind-Value="_modelo.Email" class="form-control" placeholder="nombre@bbraun.com" />
+                            <ValidationMessage For="() => _modelo.Email" class="text-danger small" />
+                        </div>
+
+                        <!-- Rol (ComboBox) -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Rol Asignado</label>
+                            <InputSelect @bind-Value="_modelo.Rol" class="form-select">
+                                <option value="">-- Seleccionar Rol --</option>
+                                @foreach (var rol in _listaRoles)
+                                {
+                                    <option value="@rol">@rol</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => _modelo.Rol" class="text-danger small" />
+                        </div>
+
+                        <div class="col-12">
+                            <hr class="text-muted opacity-25 my-2" />
+                        </div>
+
+                        <!-- Usuario (Login) -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Usuario (Login)</label>
+                            @if (EsEdicion)
+                            {
+                                <input type="text" class="form-control bg-light" value="@_modelo.UserName" disabled title="El usuario no se puede modificar" />
+                                <small class="text-muted"><i class="bi bi-lock-fill me-1"></i>Inmutable</small>
+                            }
+                            else
+                            {
+                                <InputText @bind-Value="_modelo.UserName" class="form-control" placeholder="Ej: jperez" autocomplete="off" />
+                                <ValidationMessage For="() => _modelo.UserName" class="text-danger small" />
+                            }
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Contraseña</label>
+                            <InputText @bind-Value="_modelo.Password" type="password" class="form-control"
+                                       placeholder="@(EsEdicion ? "Dejar en blanco para no cambiar" : "Contraseña segura")" autocomplete="new-password" />
+                            <ValidationMessage For="() => _modelo.Password" class="text-danger small" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="admin/usuarios" class="btn btn-ghost">Cancelar</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-save me-2"></i>Guardar Datos
+                        </button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? UserId { get; set; }
+
+    private bool EsEdicion => !string.IsNullOrEmpty(UserId);
+    private bool _cargando = true;
+    private string _mensajeError = "";
+    private List<string> _listaRoles = new();
+
+    // formulario
+    private UserFormModel _modelo = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cargando = true;
+        try
+        {
+            _listaRoles = await AuthService.GetRoles();
+
+            if (EsEdicion)
+            {
+                var usuarioExistente = await AuthService.GetUserById(UserId!);
+                _modelo = new UserFormModel
+                {
+                    Id = usuarioExistente.Id,
+                    Nombre = usuarioExistente.Nombre,
+                    Email = usuarioExistente.Email,
+                    UserName = usuarioExistente.UserName,
+                    Rol = usuarioExistente.Rol,
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _mensajeError = "Error al cargar datos: " + ex.Message;
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task GuardarCambios()
+    {
+        _mensajeError = "";
+
+        if (!EsEdicion && string.IsNullOrWhiteSpace(_modelo.Password))
+        {
+            _mensajeError = "La contraseña es obligatoria para nuevos usuarios.";
+            return;
+        }
+
+        try
+        {
+            AuthResponse respuesta;
+
+            if (EsEdicion)
+            {
+                // UpdateUserRequest
+                var request = new UpdateUserRequest
+                {
+                    Id = _modelo.Id,
+                    Nombre = _modelo.Nombre,
+                    Email = _modelo.Email,
+                    Rol = _modelo.Rol,
+                    Password = string.IsNullOrWhiteSpace(_modelo.Password) ? null : _modelo.Password
+                };
+                respuesta = await AuthService.UpdateUser(request);
+            }
+            else
+            {
+                // RegisterRequest
+                var request = new RegisterRequest
+                {
+                    Nombre = _modelo.Nombre,
+                    Email = _modelo.Email,
+                    UserName = _modelo.UserName,
+                    Rol = _modelo.Rol,
+                    Password = _modelo.Password!
+                };
+                respuesta = await AuthService.Register(request);
+            }
+
+            if (respuesta.Success)
+            {
+                Nav.NavigateTo("admin/usuarios");
+            }
+            else
+            {
+                _mensajeError = respuesta.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            _mensajeError = "Error de conexión: " + ex.Message;
+        }
+    }
+
+
+    public class UserFormModel
+    {
+        public string Id { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El email es obligatorio")]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El usuario es obligatorio")]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Debes seleccionar un rol")]
+        public string Rol { get; set; } = string.Empty;
+
+
+        public string? Password { get; set; }
+    }
+}
